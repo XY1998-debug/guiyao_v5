@@ -1097,7 +1097,7 @@ def backtest_stock(code: str, strategy: str = "macd_cross", days: int = 500,
     返回: 收益率/年化/最大回撤/胜率/夏普比率/每笔交易明细
     """
     try:
-        from src.backtest import run_backtest
+        from engine.backtest import run_backtest
         result = run_backtest(code, strategy, days, capital, stop_loss, take_profit, max_hold)
         d = asdict(result)
         d.pop("trades", None)  # 默认不返回交易明细，太长
@@ -1112,7 +1112,7 @@ def backtest_stock(code: str, strategy: str = "macd_cross", days: int = 500,
 def backtest_with_trades(code: str, strategy: str = "macd_cross", days: int = 500) -> str:
     """回测并返回完整交易明细"""
     try:
-        from src.backtest import run_backtest
+        from engine.backtest import run_backtest
         result = run_backtest(code, strategy, days)
         d = asdict(result)
         d["total_return"] = f"{result.total_return:.1%}"
@@ -2368,7 +2368,7 @@ def debate_analysis(code: str) -> str:
     except Exception as e:
         return _json.dumps({'error': f'LLM init: {e}'}, ensure_ascii=False)
 
-    from agent.prompts import BULL_PROMPT, BEAR_PROMPT, JUDGE_PROMPT
+    from agent.daily_tasks import BULL_PROMPT, BEAR_PROMPT, JUDGE_PROMPT
 
     bull_msgs = [{'role': 'user', 'content': BULL_PROMPT.format(**context)}]
     bull_resp = client.chat(bull_msgs)

@@ -149,7 +149,7 @@ def backtest_breakout(
             if pnl >= take_profit_add and not p.get("added", False):
                 add_shares = int(cash * (add_pct - trial_pct) / price / 100) * 100
                 if add_shares >= 100:
-                    add_cost = add_shares * price * 1.0008
+                    add_cost = add_shares * price * 1.0086  # 买入佣金万8.6（国泰海通个股）
                     if add_cost <= cash:
                         cash -= add_cost
                         p["shares"] += add_shares
@@ -212,7 +212,7 @@ def backtest_breakout(
             shares = int(trial_amount / price / 100) * 100
             if shares < 100:
                 continue
-            cost = shares * price * 1.0008
+            cost = shares * price * 1.0086  # 买入佣金万8.6（国泰海通个股）
             if cost <= cash:
                 cash -= cost
                 pos[code] = {

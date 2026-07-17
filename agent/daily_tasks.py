@@ -267,10 +267,10 @@ def midday_adjuster(trade_date: str = "") -> str:
         positions = _pos()
         pl = []
         for p in positions[:5]:
-            k = _k(p["stock_code"],3)
+            k = _k(p["code"],3)
             if k:
                 lc = k[-1]["close"]
-                pct = f"{(lc/p['avg_cost']-1)*100:+.1f}%" if p["avg_cost"] else "?"
+                pct = f"{(lc/p['avg_cost']-1)*100:+.1f}%" if p["cost"] else "?"
                 pl.append(f"- {p['stock_name']}({p['stock_code']}) 成本{p['avg_cost']:.2f} 现{lc:.2f} {pct}")
         ps = "\n".join(pl) if pl else "空仓"
         client = _llm()
@@ -297,10 +297,10 @@ def evening_reviewer(trade_date: str = "") -> str:
         positions = _pos()
         pl_all, total = [], 0
         for p in positions[:10]:
-            k = _k(p["stock_code"],5)
+            k = _k(p["code"],5)
             if k:
                 lc = k[-1]["close"]
-                pnl = (lc-p["avg_cost"])*p["shares"]
+                pnl = (lc-p["cost"])*p["shares"]
                 total += pnl
                 pct = f"{(lc/p['avg_cost']-1)*100:+.1f}%"
                 pl_all.append(f"- {p['stock_name']}({p['stock_code']}) 成本{p['avg_cost']:.2f} 现{lc:.2f} {pnl:+.0f}({pct})")
@@ -404,14 +404,14 @@ def weekly_summary(saturday: str = None) -> str:
             pl_total = 0
             pl_list = []
             for p in positions:
-                k = _k(p["stock_code"],5)
+                k = _k(p["code"],5)
                 if k:
                     lc = k[-1]["close"]
-                    pnl = (lc-p["avg_cost"])*p["shares"]
+                    pnl = (lc-p["cost"])*p["shares"]
                     pl_total += pnl
                     pl_list.append(f"- {p['stock_name']}({p['stock_code']}) {pnl:+.0f}元")
             weekly_pnl = f"总盈亏:{pl_total:+.0f}元\n"+"\n".join(pl_list) if pl_list else "空仓"
-            lessons = conn.execute("SELECT content FROM long_term_memories WHERE tags_json LIKE '%daily_review%' ORDER BY updated_at DESC LIMIT 5").fetchall()
+            lessons = conn.execute("SELECT content FROM long_term_memories WHERE tags LIKE '%daily_review%' ORDER BY updated_at DESC LIMIT 5").fetchall()
             weekly_lessons = "\n".join([f"- {l['content'][:200]}" for l in lessons]) or "无"
             sector = _call("sector_rotation_analysis", days=5)
         finally: conn.close()

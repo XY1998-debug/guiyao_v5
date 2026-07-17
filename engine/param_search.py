@@ -70,6 +70,7 @@ def run_single_backtest(
             price_seq[t], sig, atr_seq[t], limit_seq[t],
             init_capital, cash, pos, cost,
             bought_y, bought_t, was_ld, 1, S,
+            2.5, 0.00086, 0.001, 5.0,
         )
         bought_y[:] = bought_t
         bought_t.fill(0)

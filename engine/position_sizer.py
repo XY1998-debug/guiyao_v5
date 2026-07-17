@@ -48,12 +48,9 @@ class PositionSizer:
         # 5) 整数股 + 资金保护
         if shares >= 100:
             shares = (shares // 100) * 100
-            min_cost = shares * price * (1 + self.fee_buy)
             buy_fee = max(shares * price * self.fee_buy, self.min_fee)
-        if available_cash < shares * price + buy_fee:
+            if available_cash < shares * price + buy_fee:
                 shares = 0
-        else:
-            pass
 
         # 6) VaR 约束 (简化: 250天5%分位)
         # 由回测引擎传入 var_5pct

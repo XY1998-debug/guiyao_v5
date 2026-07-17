@@ -71,7 +71,7 @@ def backtest_kernel_v3(
         nv = cash[u, 0]
         for s in range(n_stocks):
             nv += pos[u, s] * prices[s]
-        risk_budget = max(nv * RISK_PCT, 0.0)
+        initial_
 
         for s in range(n_stocks):
             if signals[u, s] != 1:
@@ -109,7 +109,7 @@ def backtest_kernel_v3(
             nv = cash[u, 0]
             for s2 in range(n_stocks):
                 nv += pos[u, s2] * prices[s2]
-            risk_budget = max(nv * RISK_PCT, 0.0)
+            
 
 
 @njit(cache=True)
