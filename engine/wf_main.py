@@ -11,9 +11,11 @@ def run_wf_validation(params_grid,dates,ret,rd,eng,stress=None,mode="full"):
     verify_no_leakage(w)
     passed,sl = [],[]
     for p in params_grid:
-        wp = [evaluate(p,dates,ret,rd,wi)["pass"] for wi in w]
+        evals = [evaluate(p,dates,ret,rd,wi) for wi in w]
+        wp = [e["pass"] for e in evals]
         if sum(wp)/len(wp)>=0.85:
             passed.append(p)
+            sl.append([e.get("sharpe",0) for e in evals])
     if mode=="fast":
         return passed
     final = []
