@@ -53,7 +53,7 @@ def walk_forward_meso(df: pl.DataFrame) -> dict:
                 row = df.filter((pl.col("date") == dt) & (pl.col("code") == code))
                 if len(row) > 0:
                     pos_val += v.get("shares", 0) * row["close"].to_numpy()[0]
-            nv_train.append(50000.0 + pos_val)
+            nv_train.append(cash + pos_val)
 
         nv_train = np.array(nv_train)
         rets_train = np.diff(nv_train) / nv_train[:-1]
