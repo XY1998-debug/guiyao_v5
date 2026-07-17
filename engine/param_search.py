@@ -74,7 +74,6 @@ def run_single_backtest(
         )
         # 跨日 T+1 状态迁移: 今日买入标记 → 昨日买入标记
         np.copyto(bought_y, bought_t)
-        bought_t.fill(0)_t
         bought_t.fill(0)
         was_ld = (np.abs(price_seq[t] - limit_seq[t]) < 0.01).astype(np.int8)
         nv_seq.append(cash[0, 0] + np.sum(pos[0] * price_seq[t]))
