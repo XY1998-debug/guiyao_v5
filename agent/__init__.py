@@ -2656,7 +2656,7 @@ def analyze_stock(code: str) -> str:
 
 
 from agent.tools.registry import TOOL_DEFINITIONS
-from agent.tools.registry import TOOL_DISPATCH
+# 注意: TOOL_DISPATCH 已在上方构建，此处不再覆盖 registry 的空字典
 # ===== Hermes Daily Tasks (auto-registered) =====
 try:
     from agent.daily_tasks import DAILY_TOOLS as _DAILY_TOOLS
