@@ -48,7 +48,11 @@ def walk_forward_meso(df: pl.DataFrame) -> dict:
                 dec = brain.decide_trades(rankings, regime)
                 brain.execute_trades(dec, dt)
 
-            pos_val = sum(v.get("shares", 0) for v in brain.positions.values())
+            pos_val = 0
+            for code, v in brain.positions.items():
+                row = df.filter((pl.col("date") == dt) & (pl.col("code") == code))
+                if len(row) > 0:
+                    pos_val += v.get("shares", 0) * row["close"].to_numpy()[0]
             nv_train.append(50000.0 + pos_val)
 
         nv_train = np.array(nv_train)
