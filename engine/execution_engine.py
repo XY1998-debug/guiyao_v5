@@ -48,7 +48,6 @@ class ExecutionEngine:
         if regime == chr(98)+chr(101)+chr(97)+chr(114): return None
         if signal == 1:
             gamma = self.GAMMA.get(regime, 1.0)
-            sl = price - atr_safe * m_sl  # gamma已剥离
             m_sl = self.STOCK_MSL if asset_type=="stock" else self.ETF_MSL
             rr = self.STOCK_RRR if asset_type=="stock" else self.ETF_RRR
             sl = round(price - atr_safe * m_sl, 2)

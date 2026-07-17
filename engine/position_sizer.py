@@ -53,7 +53,7 @@ class PositionSizer:
         if available_cash < shares * price + buy_fee:
                 shares = 0
         else:
-            shares = 0
+            pass
 
         # 6) VaR 约束 (简化: 250天5%分位)
         # 由回测引擎传入 var_5pct

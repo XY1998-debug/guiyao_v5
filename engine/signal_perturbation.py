@@ -191,7 +191,9 @@ def generate_signals_vectorized(
     # 跟踪止盈：从近 5 日最高点回落 8%
     high_5d = np.zeros_like(close)
     for i in range(1, 6):
-        high_5d = np.maximum(high_5d, np.roll(close, i, axis=0))
+        shifted = np.roll(close, i, axis=0)
+        shifted[:i] = 0.0  # mask rolled rows to prevent future leak
+        high_5d = np.maximum(high_5d, shifted)
     trailing_stop = close[None, :, :] < high_5d[None, :, :] * 0.92
     sell_signal = hard_stop | trailing_stop
 

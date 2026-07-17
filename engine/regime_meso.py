@@ -131,7 +131,7 @@ class MesoBrain:
 
         return decision
 
-    def execute_trades(self, decision: dict, calc_date: str) -> list:
+    def execute_trades(self, decision: dict, calc_date: str, current_price: float = 0.0) -> list:
         """执行决策，返回交易记录列表"""
         trades = []
 

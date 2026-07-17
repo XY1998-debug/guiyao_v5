@@ -33,10 +33,10 @@ def backtest_kernel_v3(
 ):
     """单日沙盒推进内核：并行遍历所有平行宇宙"""
 
-    FEE_BUY = 0.0003   # 万三佣金
-    FEE_SELL = 0.0013  # 万三佣金 + 千一印花税
-    MIN_FEE = 5.0      # 最低5元
-    RISK_PCT = 0.015   # 每笔风险预算 1.5% 本金
+    FEE_BUY = commission_rate
+    FEE_SELL = commission_rate + stamp_duty
+    MIN_FEE = min_commission
+    RISK_PCT = 0.0225   # 每笔风险预算 2.25% 本金
 
     for u in prange(n_univ):
         # ── 先卖后买 ──
