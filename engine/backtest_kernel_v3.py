@@ -72,7 +72,6 @@ def backtest_kernel_v3(
         for s in range(n_stocks):
             nv += pos[u, s] * prices[s]
         initial_risk_budget = max(nv * RISK_PCT, 0.0)
-        initial_
 
         for s in range(n_stocks):
             if signals[u, s] != 1:
