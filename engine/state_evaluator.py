@@ -11,7 +11,7 @@ def evaluate(params,dates,ret,rd,w):
     tr = ret[mask]
     if len(tr)<5: return {"pass":False}
     ds = rd.filter(pl.col("date").is_between(dates[w["test"][0]],dates[w["test"][1]-1]))
-    dom = ds["regime"].mode()[0] if len(ds)>0 else "chop" if not isinstance(ds["regime"],list) else "chop"
+    dom = ds["regime"].mode()[0] if len(ds) > 0 else "chop"
     lv = LEVELS.get(dom,LEVELS["chop"])
     sh = np.mean(tr)/np.std(tr)*252**0.5 if np.std(tr)>0 else 0
     dd = abs(np.min(np.minimum.accumulate(np.cumprod(1+tr))/np.cumprod(1+tr)-1))
