@@ -127,7 +127,7 @@ def backtest_breakout(
             trail_stop = (price - p["peak_price"]) / p["peak_price"]
 
             if pnl <= stop_loss or (pnl > 0.05 and trail_stop < -0.08):
-                sell_val = p["shares"] * price * 0.9992
+                sell_val = p["shares"] * price * 0.99814
                 cash += sell_val
                 p["pnl"] = pnl
                 trades.append(TradeRecord(
@@ -176,7 +176,7 @@ def backtest_breakout(
                 days_held = 0
             if days_held > 20 and p.get("pnl", 0) < 0:
                 pr = p["current_price"]
-                cash += p["shares"] * pr * 0.9992
+                cash += p["shares"] * pr * 0.99814
                 trades.append(TradeRecord(
                     code=code, buy_date=p["buy_date"],
                     buy_price=p["cost"], shares=p["shares"],
