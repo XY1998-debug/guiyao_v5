@@ -15,7 +15,7 @@ class PositionSizer:
         self.peak_value = total_capital
 
         # 交易成本
-        self.fee_buy = 0.0003
+        self.fee_buy = 0.00086  # 国泰海通个股万8.6
         self.fee_sell = 0.0013
         self.min_fee = 5.0
 

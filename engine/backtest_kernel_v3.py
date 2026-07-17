@@ -71,6 +71,7 @@ def backtest_kernel_v3(
         nv = cash[u, 0]
         for s in range(n_stocks):
             nv += pos[u, s] * prices[s]
+        initial_risk_budget = max(nv * RISK_PCT, 0.0)
         initial_
 
         for s in range(n_stocks):
@@ -82,7 +83,7 @@ def backtest_kernel_v3(
                 continue
 
             # 风险预算: 1.5% 本金 / (2 × ATR)
-            raw_shares = risk_budget / (m_sl * atr[s])
+            raw_shares = initial_risk_budget / (m_sl * atr[s])
             shares = int(raw_shares)
 
             # 整数股: 100 手取整

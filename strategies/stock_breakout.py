@@ -42,6 +42,7 @@ class StockScreener:
 
     def __init__(self, top_n: int = 30):
         self.top_n = top_n
+        self.min_amount = self.MIN_AMOUNT_CHOP  # 默认Chop
 
     def screen(self, df: pl.DataFrame, today: str) -> list:
         """返回今日候选股票代码列表"""
