@@ -51,7 +51,7 @@ def run_single_backtest(
     cost = np.zeros((1, S), dtype=np.float64)
     bought_y = np.zeros((1, S), dtype=np.int8)
     bought_t = np.zeros((1, S), dtype=np.int8)
-    was_ld = np.zeros(S, dtype=np.int8)
+    was_ld = (limit_seq[0] > 0).astype(np.int8)  # 首日无昨日跌停
     nv_seq = [init_capital]
 
     mom_th, vol_th, rev_th, sell_th = params

@@ -34,7 +34,7 @@ class PositionSizer:
         """
         # 1) 风险预算 (1.5% 本金 / 2×ATR)
         risk = self.total_capital * 0.0225
-        risk_shares = int(risk / (2.0 * max(atr, 0.01))) if atr > 0 else 0
+        risk_shares = int(risk / (max(atr, 0.01))  # 外部乘数 m_sl 由调用方传入) if atr > 0 else 0
 
         # 2) 宏观上限
         macro_shares = int(self.total_capital * max_single_pct / price) if price > 0 else 0
