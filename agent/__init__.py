@@ -2368,24 +2368,24 @@ def debate_analysis(code: str) -> str:
     except Exception as e:
         return _json.dumps({'error': f'LLM init: {e}'}, ensure_ascii=False)
 
-    from agent.daily_tasks import BULL_PROMPT, BEAR_PROMPT, JUDGE_PROMPT
+    from agent.daily_tasks import BULL, BEAR, JUDGE
 
-    bull_msgs = [{'role': 'user', 'content': BULL_PROMPT.format(**context)}]
+    bull_msgs = [{'role': 'user', 'content': BULL.format(**context)}]
     bull_resp = client.chat(bull_msgs)
     bull_args = bull_resp.get('content', '')
 
-    bear_msgs = [{'role': 'user', 'content': BEAR_PROMPT.format(**context)}]
+    bear_msgs = [{'role': 'user', 'content': BEAR.format(**context)}]
     bear_resp = client.chat(bear_msgs)
     bear_args = bear_resp.get('content', '')
 
     rebuttal_bull = client.chat([{'role': 'user', 'content':
-        BULL_PROMPT.format(**context) + '\n\n## Bear countered\n' + bear_args[:1000]
+        BULL.format(**context) + '\n\n## Bear countered\n' + bear_args[:1000]
         + '\n\nRefute bear. Strengthen your case.'}])
     rebuttal_bear = client.chat([{'role': 'user', 'content':
-        BEAR_PROMPT.format(**context) + '\n\n## Bull countered\n' + bull_args[:1000]
+        BEAR.format(**context) + '\n\n## Bull countered\n' + bull_args[:1000]
         + '\n\nRefute bull. Strengthen your case.'}])
 
-    judge_msgs = [{'role': 'user', 'content': JUDGE_PROMPT.format(**{
+    judge_msgs = [{'role': 'user', 'content': JUDGE.format(**{
         **context, 'bull_args': bull_args[:1500], 'bear_args': bear_args[:1500]})}]
     judge_resp = client.chat(judge_msgs)
     judge_text = judge_resp.get('content', '')
