@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 logger = logging.getLogger("quantpilot.daily_tasks")
-DB = "/home/ubuntu/quantpilot/data/quantpilot.db"
+DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "quantpilot.db")
 
 def _db():
     c = sqlite3.connect(DB); c.row_factory = sqlite3.Row; return c
