@@ -59,7 +59,7 @@ class StockScreener:
         )
 
         # 筛选: 成交 > 5亿
-        candidates = avg_amount.filter(pl.col("avg_amount") > self.MIN_AMOUNT)
+        candidates = avg_amount.filter(pl.col("avg_amount") > self.min_amount)
 
         # 按振幅排名取 Top N
         top = candidates.sort("amplitude", descending=True).head(self.top_n)

@@ -29,7 +29,7 @@ def walk_forward_meso(df: pl.DataFrame) -> dict:
             continue
 
         train_dates = all_dates[:train_end]
-        test_dates = all_dates[:test_end]
+        test_dates = all_dates[train_end:test_end]
 
         train_df = df.filter(pl.col("date").is_in(train_dates))
         test_df = df.filter(pl.col("date").is_in(test_dates))
