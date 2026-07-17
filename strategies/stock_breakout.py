@@ -287,7 +287,7 @@ def walk_forward(df, n_splits=3):
         )
         # 测试期结果
         test_r = backtest_breakout(
-            df.filter(pl.col("date").is_in(all_dates[:test_end]))
+            df.filter(pl.col("date").is_in(all_dates[train_end+1:test_end]))
         )
 
         results.append({
