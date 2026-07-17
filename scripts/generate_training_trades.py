@@ -73,6 +73,7 @@ def run_backtest_for_universes(
             yesterday_limit_down,
             U,
             S,
+            2.5, 0.00086, 0.001, 5.0,
         )
 
         # 记录快照

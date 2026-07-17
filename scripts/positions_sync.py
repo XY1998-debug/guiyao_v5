@@ -14,7 +14,7 @@ def sync_positions():
     DST.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(DB))
     rows = conn.execute(
-        "SELECT code, name, cost, qty, buy_date, current_price FROM live_positions"
+        "SELECT code, name, cost, shares, buy_date, current_price FROM live_positions"
     ).fetchall()
     conn.close()
 
