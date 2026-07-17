@@ -24,7 +24,7 @@ ALERTS_FILE = "/home/ubuntu/guiyao_v5/data/price_alerts.parquet"
 TZ = 8  # UTC+8
 
 def now():
-    return datetime.utcfromtimestamp(time.time() + TZ * 3600)
+    return datetime.now()  # 本地时间（Windows为北京时间）
 
 def in_trading_hours():
     """A股交易时段判断"""
