@@ -13,5 +13,7 @@ def evaluate(params,dates,ret,rd,w):
     dom = ds["regime"].mode()[0] if len(ds) > 0 else "chop"
     lv = LEVELS.get(dom,LEVELS["chop"])
     sh = np.mean(tr)/np.std(tr)*252**0.5 if np.std(tr)>0 else 0
-    dd = abs(np.min(np.minimum.accumulate(np.cumprod(1+tr))/np.cumprod(1+tr)-1))
+    cum = np.cumprod(1 + tr)
+    peak = np.maximum.accumulate(cum)
+    dd = abs(np.min((cum - peak) / peak))
     return {"pass":sh>lv["sharpe"] and dd<lv["dd"],"state":dom,"sharpe":sh,"dd":dd}

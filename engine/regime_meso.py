@@ -153,7 +153,7 @@ class MesoBrain:
         for code in decision["sell"]:
             if code in self.positions and self.monthly_trades < 8:
                 p = self.positions.pop(code)
-                pnl = (current_price - p["buy_price"]) * shares if p.get("buy_price") else 0  # 简化
+                pnl = (current_price - p.get("buy_price", 0)) * p.get("shares", 0) if p.get("buy_price") else 0  # 简化
                 trades.append({"action": "sell", "date": calc_date,
                                "code": code, "name": ETF_POOL.get(code, ""),
                                "shares": p.get("shares", 0), "pnl": pnl})
