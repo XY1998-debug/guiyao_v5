@@ -1,0 +1,204 @@
+agent:
+  enable_judge: true
+  max_rounds: 30
+  max_tool_result_chars: 8000
+  tool_repeat_detection_window: 5
+  verbose: true
+akshare:
+  delay_seconds: 1.0
+  timeout: 30
+baostock:
+  consecutive_fail_threshold: 3
+  reconnect_interval: 150
+  timeout: 30
+broker:
+  provider: sim
+  simulation: true
+circuit_breaker:
+  failure_threshold: 3
+  half_open_calls: 1
+  recovery_timeout: 60
+data_sources:
+  dragon_tiger:
+    fallbacks:
+    - akshare
+    primary: zzshare
+  historical:
+    fallbacks:
+    - mootdx
+    - baostock
+    - akshare
+    primary: zzshare
+  minute_kline:
+    fallbacks:
+    - zzshare
+    primary: mootdx
+  northbound:
+    fallbacks:
+    - exchange_csv
+    primary: zzshare
+  realtime:
+    fallbacks:
+    - tencent
+    primary: mootdx
+eastmoney:
+  timeout: 10.0
+embedding:
+  batch_size: 10
+  cache_max: 5000
+  dimension: 768
+  model: shibing624/text2vec-base-chinese
+  provider: local
+file_ops:
+  allowed_dirs:
+  - .
+  max_file_size: 10485760
+holidays:
+- '2026-01-01'
+- '2026-01-02'
+- '2026-02-16'
+- '2026-02-17'
+- '2026-02-18'
+- '2026-02-19'
+- '2026-02-20'
+- '2026-02-23'
+- '2026-02-24'
+- '2026-04-06'
+- '2026-05-01'
+- '2026-05-04'
+- '2026-05-05'
+- '2026-06-19'
+- '2026-10-01'
+- '2026-10-02'
+- '2026-10-05'
+- '2026-10-06'
+- '2026-10-07'
+- '2026-10-08'
+live:
+  accounts:
+    国泰海通:
+      broker: 国泰海通证券
+      cash: 30918.79
+      commission:
+        bond:
+          min: 1.0
+          rate: 5.0e-05
+        etf:
+          min: 5.0
+          rate: 5.0e-05
+        stock:
+          min: 5.0
+          rate: 8.00001e-05
+      stamp_tax_sell: 0.0005
+      total_assets: 41886.79
+      transfer_fee: 1.0e-05
+    银河证券:
+      broker: 银河证券
+      cash: 2407.54
+      commission:
+        fund:
+          min: 0.01
+          rate: 5.0e-06
+        stock:
+          min: 5.0
+          rate: 8.6e-05
+      fixed_income: 50000
+      fixed_income_maturity: '2026-07-20'
+      stamp_tax_sell: 0.0005
+      total_assets: 108279.34
+      transfer_fee: 1.0e-05
+llm:
+  flash:
+    api_key: sk-06742c13123f49e8884df05fb339ec9d
+    base_url: https://api.deepseek.com
+    max_tokens: 8192
+    model: deepseek-v4-flash
+    protocol: openai
+    provider: deepseek
+    temperature: 0.7
+  primary:
+    api_key: sk-06742c13123f49e8884df05fb339ec9d
+    base_url: https://api.deepseek.com
+    max_tokens: 16384
+    model: deepseek-v4-pro
+    protocol: openai
+    provider: deepseek
+    temperature: 0.3
+memory:
+  compression_batch: 10
+  context_max_chars: 4000
+  decay_threshold: 0.1
+  max_memories: 200
+  search_top_k: 5
+  session_ttl_hours: 24
+mode: local
+port: 7861
+retention:
+  alerts_days: 30
+  daily_kline_days: 0
+  market_snapshot_days: 365
+  minute_kline_days: 30
+  trade_log_days: 0
+retry:
+  backoff_factor: 2.0
+  base_delay: 1.0
+  jitter: true
+  max_delay: 30.0
+  max_retries: 3
+schedule:
+  evening: 30 15 * * 1-5
+  maintenance: 0 3 * * 0
+  morning: 5 9 * * 1-5
+  noon: 35 11 * * 1-5
+  strategy_evolution: 0 10 * * 6
+  watchdog_start: 10 9 * * 1-5
+  watchdog_stop: 10 15 * * 1-5
+server:
+  domain: quantpilot.cn
+simulation:
+  capital:
+    P1_顺势接力: 150000
+    P2_逆势低吸: 100000
+    P3_打板先锋: 100000
+    P4_波段猎手: 80000
+    P5_ETF轮动: 70000
+  enabled: true
+  state_filters:
+    P1_顺势接力:
+      min_streak_height: 3
+    P2_逆势低吸:
+      min_fall_count: 5
+    P3_打板先锋:
+      max_break_rate: 0.4
+      min_streak_height: 3
+sina:
+  timeout: 10.0
+tickflow:
+  api_key: ${TICKFLOW_API_KEY}
+  base_url: https://api.tickflow.org
+  rate_limits:
+    intraday_batch: 30
+    intraday_single: 60
+    kline_batch: 60
+    kline_single: 120
+    quotes_symbols: 120
+    quotes_universe: 60
+tushare:
+  token: ''
+watchdog:
+  alerts:
+    price_spike: 3.0
+    volume_spike: 3.0
+  kline_period: 5m
+  max_stocks: 30
+  poll_interval: 10
+wechat:
+  admin_users:
+  - YangJie
+  agent_id: 1000002
+  agent_secret: vJaxxotrmsA7no6ZNRG2nuTW_goEhVYnJW9bBDDUzA4
+  callback_port: 8000
+  corp_id: wwbf92bb8d06f35eac
+  enabled: true
+  encoding_aes_key: DpNFQSRjZ0JJajU4bHdMblVPdk5nc3dhRktMRlVLabc
+  token: QuantPilotToken2026
