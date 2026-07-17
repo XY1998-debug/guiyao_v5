@@ -39,6 +39,10 @@ def backtest_kernel_v3(
     RISK_PCT = 0.0225   # 每笔风险预算 2.25% 本金
 
     for u in prange(n_univ):
+        # 清零今日买入标记（外层确保不污染跨日状态）
+        for s in range(n_stocks):
+            bought_today_out[u, s] = 0
+
         # ── 先卖后买 ──
 
         # 卖出: signal == -1
@@ -49,7 +53,7 @@ def backtest_kernel_v3(
             if bought_today_in[u, s] == 1:
                 continue
             # 跌停检查: 无法卖出
-            if prices[s] <= limit_down[s] + 0.01:
+            if abs(prices[s] - limit_down[s]) < 1e-4:
                 continue
             # 连续跌停后首次打开次日: 惩罚 2% 滑点
             sell_price = prices[s]
@@ -101,6 +105,11 @@ def backtest_kernel_v3(
             cost_basis[u, s] = (total_orig + cost) / (pos[u, s] + shares)
             pos[u, s] += shares
             bought_today_out[u, s] = 1  # 今天买入，明天才能卖
+            # 重新计算可用净值，防止后续买入超预算
+            nv = cash[u, 0]
+            for s2 in range(n_stocks):
+                nv += pos[u, s2] * prices[s2]
+            risk_budget = max(nv * RISK_PCT, 0.0)
 
 
 @njit(cache=True)
