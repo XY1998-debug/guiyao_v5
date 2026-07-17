@@ -49,7 +49,8 @@ class PositionSizer:
         if shares >= 100:
             shares = (shares // 100) * 100
             min_cost = shares * price * (1 + self.fee_buy)
-            if available_cash < min_cost + self.min_fee:
+            buy_fee = max(shares * price * self.fee_buy, self.min_fee)
+        if available_cash < shares * price + buy_fee:
                 shares = 0
         else:
             shares = 0

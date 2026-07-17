@@ -105,7 +105,17 @@ def precompute_indicators(parquet_path: str) -> dict:
         atr[t] = alpha * tr[t] + (1 - alpha) * atr[t - 1]
 
     # 跌停价（前收 × 0.9，主板适用）
-    limit_down = np.round(np.roll(close, 1, axis=0) * 0.9, 2)
+    # 按市场类型设置动态跌停比例
+    codes = df.pivot(values="close", index="date", on="code").columns[1:].to_list()
+    limit_ratios = []
+    for code in codes:
+        p = code[:3]
+        if p in ("300","688"):
+            limit_ratios.append(0.8)
+        else:
+            limit_ratios.append(0.9)
+    lr = np.array(limit_ratios, dtype=np.float64)
+    limit_down = np.round(np.roll(close, 1, axis=0) * lr[np.newaxis, :], 2)
     limit_down[0] = 0.0
 
     return {
