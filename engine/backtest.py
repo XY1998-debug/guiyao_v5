@@ -63,8 +63,8 @@ class PositionSizer:
     """仓位计算器"""
 
     # 交易成本
-    BUY_FEE = 0.00025       # 佣金 0.025%
-    SELL_FEE = 0.00125      # 佣金 + 印花税 = 0.125%
+    BUY_FEE = 0.0003       # 佣金 0.025%
+    SELL_FEE = 0.0013      # 佣金 + 印花税 = 0.125%
 
     def __init__(
         self,

@@ -7,10 +7,9 @@ def classify(score,breadth,lc):
     if score<=30: return "bear"
     return "chop"
 def evaluate(params,dates,ret,rd,w):
-    mask = (dates>=w["test"][0])&(dates<w["test"][1])
-    tr = ret[mask]
+    tr = ret[w["test"][0]:w["test"][1]]
     if len(tr)<5: return {"pass":False}
-    ds = rd.filter(pl.col("date").is_between(dates[w["test"][0]],dates[w["test"][1]-1]))
+    ds = rd.filter(pl.col("date").is_between(rd["date"][w["test"][0]],rd["date"][w["test"][1]-1]))
     dom = ds["regime"].mode()[0] if len(ds) > 0 else "chop"
     lv = LEVELS.get(dom,LEVELS["chop"])
     sh = np.mean(tr)/np.std(tr)*252**0.5 if np.std(tr)>0 else 0

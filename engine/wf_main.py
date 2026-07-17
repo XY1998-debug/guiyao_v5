@@ -20,7 +20,7 @@ def run_wf_validation(params_grid,dates,ret,rd,eng,stress=None,mode="full"):
     for p in passed:
         n = len(passed)
         v3 = eng
-        dsr = calc_dsr(0.5, 80, n)
+        dsr = calc_dsr(np.mean(sharpe_list), len(sharpe_list), n)
         if dsr<=0: continue
         if stress:
             vet,evt = stress_chamber_veto(p,v3,stress)
