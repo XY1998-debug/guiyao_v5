@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>归爻 (GuiYao) — 量化交易系统</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans SC', sans-serif; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  background: linear-gradient(135deg, #0a0a0f 0%, #0f1a0f 30%, #0a0a0f 70%);
+  position: relative; overflow: hidden; text-align: center; padding: 2rem;
+}
+.hero::before {
+  content: ''; position: absolute; width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(0,200,83,0.06) 0%, transparent 70%);
+  top: -200px; right: -200px;
+}
+.hero::after {
+  content: ''; position: absolute; width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,150,255,0.04) 0%, transparent 70%);
+  bottom: -200px; left: -200px;
+}
+.logo { font-size: 5rem; font-weight: 900; background: linear-gradient(135deg, #00c853, #00e676); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; letter-spacing: 0.5rem; position: relative; z-index: 1; }
+.subtitle { font-size: 1.3rem; color: #888; font-weight: 300; margin-bottom: 3rem; position: relative; z-index: 1; letter-spacing: 0.2rem; }
+.tagline { font-size: 1.1rem; color: #555; max-width: 600px; line-height: 1.8; position: relative; z-index: 1; }
+.stats-row { display: flex; gap: 3rem; margin-top: 3rem; flex-wrap: wrap; justify-content: center; position: relative; z-index: 1; }
+.stat-item { text-align: center; }
+.stat-num { font-size: 2.8rem; font-weight: 700; color: #00c853; }
+.stat-label { font-size: 0.85rem; color: #666; margin-top: 0.3rem; }
+
+.section { max-width: 1000px; margin: 0 auto; padding: 5rem 2rem; }
+.section-title { font-size: 1.6rem; font-weight: 700; color: #00c853; margin-bottom: 0.5rem; }
+.section-subtitle { font-size: 0.9rem; color: #555; margin-bottom: 3rem; }
+
+.card { background: #111118; border: 1px solid #1a1a24; border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+
+.feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+.feature-title { font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem; }
+.feature-desc { font-size: 0.9rem; color: #888; line-height: 1.7; }
+
+.arch-diagram {
+  background: #0d0d15; border: 1px solid #1a1a24; border-radius: 16px; padding: 3rem 2rem;
+  margin: 2rem 0; text-align: center;
+}
+.arch-layer { display: inline-block; padding: 0.8rem 2rem; margin: 0.3rem; border-radius: 8px; font-size: 0.9rem; font-weight: 500; }
+.arch-layer.macro { background: rgba(0,200,83,0.15); color: #00c853; border: 1px solid rgba(0,200,83,0.3); }
+.arch-layer.meso { background: rgba(0,150,255,0.15); color: #4499ff; border: 1px solid rgba(0,150,255,0.3); }
+.arch-layer.micro { background: rgba(255,180,0,0.15); color: #ffb400; border: 1px solid rgba(255,180,0,0.3); }
+.arch-layer.exec { background: rgba(255,80,80,0.15); color: #ff5050; border: 1px solid rgba(255,80,80,0.3); }
+.arch-arrow { color: #333; font-size: 1.2rem; margin: 0.5rem 0; }
+
+.param-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+.param-table th { text-align: left; padding: 0.8rem 1rem; border-bottom: 1px solid #1a1a24; color: #888; font-weight: 400; }
+.param-table td { padding: 0.8rem 1rem; border-bottom: 1px solid #111; }
+.param-table tr:hover td { background: #0d0d18; }
+
+.value { color: #00c853; font-weight: 600; }
+.value.red { color: #ff5050; }
+
+.metric-box {
+  background: #0d0d15; border: 1px solid #1a1a24; border-radius: 12px; padding: 1.5rem;
+  text-align: center;
+}
+.metric-value { font-size: 2.2rem; font-weight: 700; color: #00c853; }
+.metric-label { font-size: 0.8rem; color: #666; margin-top: 0.5rem; }
+
+.chart-container { background: #0d0d15; border: 1px solid #1a1a24; border-radius: 12px; padding: 2rem; margin: 1.5rem 0; text-align: center; }
+
+.footer { text-align: center; padding: 3rem; color: #333; font-size: 0.8rem; border-top: 1px solid #111; }
+
+.highlight { color: #00e676; }
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .logo { font-size: 3rem; }
+  .stat-num { font-size: 2rem; }
+}
+
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem; }
+.badge.green { background: rgba(0,200,83,0.15); color: #00c853; }
+.badge.blue { background: rgba(0,150,255,0.15); color: #4499ff; }
+.badge.orange { background: rgba(255,180,0,0.15); color: #ffb400; }
+
+.timeline { position: relative; padding-left: 2rem; margin: 1.5rem 0; }
+.timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: #1a1a24; }
+.timeline-item { position: relative; padding-bottom: 1.5rem; }
+.timeline-item::before { content: ''; position: absolute; left: -2.35rem; top: 0.4rem; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: #00c853; }
+.timeline-date { font-size: 0.8rem; color: #555; }
+.timeline-title { font-size: 1rem; color: #fff; font-weight: 500; margin: 0.2rem 0; }
+.timeline-desc { font-size: 0.85rem; color: #777; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="logo">归 爻</div>
+  <div class="subtitle">A 股 量 化 交 易 系 统</div>
+  <div class="tagline">
+    从零构建的全自动量化系统 · 三层脑架构 · Numba 并行引擎 · 960 组虚拟宇宙参数竞跑
+  </div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-num">14</div><div class="stat-label">核心模块</div></div>
+    <div class="stat-item"><div class="stat-num">2,100+</div><div class="stat-label">行 Python 代码</div></div>
+    <div class="stat-item"><div class="stat-num">960</div><div class="stat-label">虚拟宇宙参数组</div></div>
+    <div class="stat-item"><div class="stat-num">7+</div><div class="stat-label">轮专家论证</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">系统架构</div>
+  <div class="section-subtitle">三层脑决策链 + 执行引擎 + 影子账本闭环</div>
+
+  <div class="arch-diagram">
+    <div class="arch-layer macro">宏观脑 · 市场状态检测</div>
+    <div class="arch-arrow">▼</div>
+    <div class="arch-layer meso">中观脑 · ETF 轮动排名</div>
+    <div class="arch-arrow">▼</div>
+    <div class="arch-layer micro">微观脑 · 个股突破信号</div>
+    <div class="arch-arrow">▼</div>
+    <div class="arch-layer exec">执行层 · Gate → Calculator → Injector</div>
+    <br><br>
+    <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:1rem">
+      <span style="color:#666;font-size:0.85rem">⬤ 影子账本</span>
+      <span style="color:#666;font-size:0.85rem">⬤ 虚拟宇宙 960 组</span>
+      <span style="color:#666;font-size:0.85rem">⬤ Walk-Forward 验证</span>
+      <span style="color:#666;font-size:0.85rem">⬤ 压力舱一票否决</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-title">宏观脑</div>
+      <div class="feature-desc">
+        趋势(40)+波动(30)+宽度(30)三维评分，24 个参数终裁锁定。
+        阈值 BEAR=25 / BULL=70，Bear 一票否决所有买入，Chop 仅 ETF 轮动。
+        趋势保护机制、宽度否决、Bull 滞后退出。
+      </div>
+    </div>
+    <div class="card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">中观脑</div>
+      <div class="feature-desc">
+        22 只 ETF 池，20日/60日 RS 等权 0.5/0.5 排名。周频轮动，Top 3 持仓，Top 5 缓冲带。
+        安全垫机制：全 RS 负值时自动切国债。
+      </div>
+    </div>
+    <div class="card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">微观脑</div>
+      <div class="feature-desc">
+        210 只主板股票，3 倍放量选股，20 日振幅 Top 30% 过滤。
+        胜率 24%，盈亏比 4.8。动态 MIN_AMOUNT 三档调节（Bull 3亿 / Chop 2.5亿）。
+      </div>
+    </div>
+    <div class="card">
+      <div class="feature-icon">🛡️</div>
+      <div class="feature-title">执行引擎</div>
+      <div class="feature-desc">
+        ATR 动态止损止盈，分策略参数（个股 M_SL=2.5/RRR=3.5, ETF M_SL=1.5/RRR=2.0）。
+        ATR 熔断、价格笼子 ±2%、滑点分级、冷启动宽限期、新老划断。
+        实盘费率：国泰海通万0.8/银河ETF免五。
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">核心指标</div>
+  <div class="section-subtitle">Walk-Forward 验证结果 · 2023-02 ~ 2026-07</div>
+
+  <div class="grid-3">
+    <div class="metric-box">
+      <div class="metric-value">22</div>
+      <div class="metric-label">ETF 轮动池 · 6 窗口 WF 通过</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-value">97.2%</div>
+      <div class="metric-label">RISK_PCT=2.25% 信号执行率</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-value">62</div>
+      <div class="metric-label">个股池覆盖行业数</div>
+    </div>
+  </div>
+  <div class="grid-3" style="margin-top:1rem">
+    <div class="metric-box">
+      <div class="metric-value">26,710</div>
+      <div class="metric-label">行业标签库</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-value">5,546</div>
+      <div class="metric-label">备用数据源股票数</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-value">829</div>
+      <div class="metric-label">回测天数</div>
+    </div>
+  </div>
+
+  <div class="chart-container" style="margin-top:2rem">
+    <svg viewBox="0 0 600 200" width="100%" style="max-width:600px">
+      <text x="300" y="25" text-anchor="middle" fill="#888" font-size="13">状态分布对比（827天）</text>
+      <!-- 旧阈值 -->
+      <rect x="30" y="170" width="170" height="20" rx="4" fill="#ff5050" opacity="0.8"/>
+      <text x="30" y="162" fill="#666" font-size="11">旧阈值 Bear 75.2%</text>
+      <rect x="30" y="140" width="170" height="20" rx="4" fill="#ffb400" opacity="0.8"/>
+      <text x="30" y="132" fill="#666" font-size="11">旧阈值 Chop 17.6%</text>
+      <rect x="30" y="110" width="170" height="20" rx="4" fill="#00c853" opacity="0.8"/>
+      <text x="30" y="102" fill="#666" font-size="11">旧阈值 Bull 7.2%</text>
+      <!-- 新阈值 -->
+      <rect x="350" y="170" width="35" height="20" rx="4" fill="#ff5050" opacity="0.8"/>
+      <text x="350" y="162" fill="#666" font-size="11">Bear 15.7%</text>
+      <rect x="350" y="140" width="190" height="20" rx="4" fill="#ffb400" opacity="0.8"/>
+      <text x="350" y="132" fill="#666" font-size="11">Chop 84.3%</text>
+      <rect x="350" y="110" width="5" height="20" rx="4" fill="#00c853" opacity="0.8"/>
+      <text x="350" y="102" fill="#666" font-size="11">Bull —</text>
+      <!-- 箭头 -->
+      <text x="260" y="155" fill="#444" font-size="14" text-anchor="middle">→</text>
+      <text x="260" y="125" fill="#444" font-size="14" text-anchor="middle">向 Chop 收敛</text>
+    </svg>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">技术亮点</div>
+  <div class="section-subtitle">为什么归爻不是普通量化脚本</div>
+
+  <div class="card">
+    <div class="feature-title">⚡ Numba 并行回测引擎</div>
+    <div class="feature-desc">
+      480 组参数 × 210 只股票 × 827 天日线回测仅需 <span class="highlight">0.05 秒/日</span>。
+      纯 NumPy 向量化 + 多线程并行，无 Python 循环。
+      支持 T+1 约束、跌停判定、开板惩罚、自动取整 100 股。
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="feature-title">🧬 960 组虚拟宇宙参数竞跑</div>
+    <div class="feature-desc">
+      每天接收真实行情，60 日滚动 Calmar 排名，末尾 20% 淘汰，LHS 补新。
+      非传统 Grid Search——这是一个<span class="highlight">持续进化的参数生态</span>。
+      参数通过率 > 85% 进审计轨道，DSR 多重检验校正 + 压力舱一票否决。
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="feature-title">📐 Walk-Forward 验证框架（6 窗口）</div>
+    <div class="feature-desc">
+      <span class="highlight">6 段非重叠窗口</span> · Warmup 60 天 · Purge 35 天隔离带防信息泄露<br>
+      分层通过门槛（Bull/Chop/Bear 各自不同）· DSR 多重检验校正 · K-S 收益分布一致性检验<br>
+      参数高原测试 · 极端行情压力舱（2015 股灾 / 2024 微盘踩踏 / 2024 急涨）
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="feature-title">🔄 影子账本闭环</div>
+    <div class="feature-desc">
+      每日模拟执行所有 AI 信号，自动对比实盘/影子收益曲线。
+      <span class="highlight">每周自动对比</span>，发现策略漂移立即告警。
+      与实时盯盘、企业微信推送全链路打通。
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">参数论证历程</div>
+  <div class="section-subtitle">每一行代码都经过了专家质询</div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">第 1-2 轮</div>
+      <div class="timeline-title">WF 验证框架升级 + 核心参数</div>
+      <div class="timeline-desc">6 窗口 + Purge + DSR + 压力舱。宏观脑权重、RS 权重、止损止盈乘数、放量倍数。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">第 3 轮</div>
+      <div class="timeline-title">仲裁终裁</div>
+      <div class="timeline-desc">VOL_SLOPE、趋势分割修正、Bear 阈值。gamma 剥离止损。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">第 4 轮</div>
+      <div class="timeline-title">宏观脑阈值 + 个股池</div>
+      <div class="timeline-desc">BULL=70/BEAR=25。210 只主板大盘股，62 行业。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">第 5 轮</div>
+      <div class="timeline-title">最终扫尾</div>
+      <div class="timeline-desc">RISK_PCT=2.25%、MIN_AMOUNT 动态三档、M_SL 必传参数化、费率实盘化。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">终裁</div>
+      <div class="timeline-title"><span class="highlight">32 个参数全部锁定</span></div>
+      <div class="timeline-desc">用户约定 3 个 · A 股规则 2 个 · 专家论证 22 个 · 扫尾论证 5 个 · 零遗漏。</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">约束与边界</div>
+  <div class="section-subtitle">10 万元实盘 · 纯做多 · 不融资融券</div>
+
+  <table class="param-table">
+    <tr><th>约束</th><th>值</th></tr>
+    <tr><td>本金</td><td><span class="value">10 万</span>（银河 ETF 5 万 + 国泰海通个股 5 万）</td></tr>
+    <tr><td>交易成本</td><td>买入万三最低 5 元，卖出万三+千一印花税最低 5 元（回测保守费率）</td></tr>
+    <tr><td>最小交易</td><td><span class="value">1 股</span>（非 100 股的整数倍可成交）</td></tr>
+    <tr><td>持仓限制</td><td>最大 3 只，纯多头</td></tr>
+    <tr><td>技术栈</td><td>Python 3.12 + NumPy + Numba + Polars · 零数据库 · 零 Web 框架 · 零外部依赖</td></tr>
+    <tr><td>运行环境</td><td>本地 Windows 12 GB RAM + 腾讯云 3.6 GB RAM</td></tr>
+    <tr><td>数据源</td><td>mootdx（通达信）主力 + zzshare 备用</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  归爻 (GuiYao) V5.P1 · 2026-07-17 · 由 YangJie 独立开发 · 参数已终裁锁定
+</div>
+
+</body>
+</html>
