@@ -26,6 +26,10 @@ def backtest_kernel_v3(
     bought_today_out,     # (U, S) int8    — 今日买入标记(写入)
     yesterday_limit_down, # (S,) int8     — 昨日是否跌停(只读)
     n_univ, n_stocks,     # int — 维度
+    m_sl,             # float — 止损乘数(个股2.5/ETF1.5)
+    commission_rate,  # float — 买入佣金率(国泰0.0008/银河0.0086)
+    stamp_duty,       # float — 卖出印花税率(0.001)
+    min_commission,   # float — 最低佣金(5.0)
 ):
     """单日沙盒推进内核：并行遍历所有平行宇宙"""
 
@@ -74,7 +78,7 @@ def backtest_kernel_v3(
                 continue
 
             # 风险预算: 1.5% 本金 / (2 × ATR)
-            raw_shares = risk_budget / (2.0 * atr[s])
+            raw_shares = risk_budget / (m_sl * atr[s])
             shares = int(raw_shares)
 
             # 整数股: 100 手取整

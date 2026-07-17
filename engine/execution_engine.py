@@ -33,18 +33,27 @@ class ExecutionEngine:
     GAMMA = {"bull":1.2,"chop":1.0,"bear":-1.0}
     SLIPPAGE = {"high":0.001,"mid":0.002,"low":0.003}
     PRICE_CAGE = 0.02
+    # 股票/ETF分策略止损止盈（仲裁专家终裁）
+    STOCK_MSL = 2.5; STOCK_RRR = 3.5
+    ETF_MSL = 1.5; ETF_RRR = 2.0
+    GAMMA = {"bull":1.2,"chop":1.0,"bear":-1.0}
+
 
     def calculate(self, code, signal, price, atr, atr20,
-                  entry_price=0, position_pct=0, regime="chop", vol_rank="mid"):
+                  entry_price=0, position_pct=0, regime="chop", vol_rank="mid", asset_type="stock"):
         if not gate_macro_veto(regime, "stock" if signal==1 else "etf"):
             return None
         mkt = _get_market(code)
         atr_safe = atr20 if (atr>3*atr20 and atr20>0.01) else atr
+        if regime == chr(98)+chr(101)+chr(97)+chr(114): return None
         if signal == 1:
             gamma = self.GAMMA.get(regime, 1.0)
-            sl = price - atr_safe * 2.0 * gamma
+            sl = price - atr_safe * m_sl  # gamma已剥离
+            sl = price - atr_safe * (self.STOCK_MSL if asset_type=="stock" else self.ETF_MSL)
+            rr = self.STOCK_RRR if asset_type=="stock" else self.ETF_RRR
+            tp = round(entry + (entry - sl) * rr, 2)
             entry = round(price * (1 + self.SLIPPAGE.get(vol_rank,0.002)), 2)
-            tp = round(entry + (entry - sl) * 2.5, 2)
+            
             return PriceSuggestion(entry, round(sl,2), tp, 0.10, regime, mkt)
         if signal == -1 and entry_price > 0:
             pnl = (price - entry_price) / entry_price

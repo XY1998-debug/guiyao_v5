@@ -33,7 +33,7 @@ class PositionSizer:
         Returns: 0 表示不买
         """
         # 1) 风险预算 (1.5% 本金 / 2×ATR)
-        risk = self.total_capital * 0.015
+        risk = self.total_capital * 0.0225
         risk_shares = int(risk / (2.0 * max(atr, 0.01))) if atr > 0 else 0
 
         # 2) 宏观上限

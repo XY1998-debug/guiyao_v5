@@ -36,7 +36,9 @@ class TradeRecord:
 class StockScreener:
     """筛选高弹性活跃股: 日均成交 > 5亿 + 20日振幅 Top 30"""
 
-    MIN_AMOUNT = 5e8   # 5亿
+    MIN_AMOUNT_BULL = 3
+MIN_AMOUNT_CHOP = 2.5
+MIN_AMOUNT_BEAR = 2.5e8   # 5亿
 
     def __init__(self, top_n: int = 30):
         self.top_n = top_n

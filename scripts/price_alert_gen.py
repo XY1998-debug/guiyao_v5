@@ -1,9 +1,9 @@
 # 归爻 V5.P1 — 价格告警生成器
 # 每日09:10执行引擎算完价格后运行，写入price_alerts.parquet
 import sys, os, json, polars as pl
-sys.path.insert(0, '/home/ubuntu/guiyao_v5')
+sys.path.insert(0, r"H:\归爻")
 
-ALERTS_PATH = '/home/ubuntu/guiyao_v5/data/price_alerts.parquet'
+ALERTS_PATH = r"H:\归爻\data\price_alerts.parquet"
 
 def generate_alerts(signals_with_price, regime="chop"):
     """

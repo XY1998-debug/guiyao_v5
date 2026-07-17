@@ -100,7 +100,7 @@ def precompute_indicators(parquet_path: str) -> dict:
     tr[0] = high[0] - low[0]
     atr = np.zeros_like(close)
     atr[0] = tr[0]
-    alpha = 2 / (14 + 1)
+    alpha = 2 / (20 + 1)
     for t in range(1, T):
         atr[t] = alpha * tr[t] + (1 - alpha) * atr[t - 1]
 

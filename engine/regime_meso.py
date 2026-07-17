@@ -71,7 +71,7 @@ class MesoBrain:
             # 60日涨幅
             ret_60 = closes[-1] / closes[-61] - 1.0 if len(closes) >= 61 else 0.0
 
-            rs = ret_20 * 0.7 + ret_60 * 0.3
+            rs = ret_20 * 0.5 + ret_60 * 0.5
             results.append((code, rs))
 
         results.sort(key=lambda x: -x[1])
