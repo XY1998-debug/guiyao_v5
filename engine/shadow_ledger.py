@@ -93,8 +93,8 @@ class ShadowLedger:
         buy_price, held = row
         matched = min(shares, held)
         # 卖出盈亏 = (卖出价 - 买入价) × 股数 - 买入佣金 - 卖出佣金 - 印花税
-        cost_buy_fee = max(matched * buy_price * 0.00086, 5.0)
-        cost_sell_fee = max(matched * price * (0.00086 + 0.001), 5.0)
+        cost_buy_fee = max(matched * buy_price * 0.00008, 5.0)
+        cost_sell_fee = max(matched * price * 0.00108, 5.0)
         return (price - buy_price) * matched - cost_buy_fee - cost_sell_fee
 
     def _update_position(self, conn, stock: str, source: str,

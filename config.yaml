@@ -1,204 +1,195 @@
-agent:
-  enable_judge: true
-  max_rounds: 30
-  max_tool_result_chars: 8000
-  tool_repeat_detection_window: 5
-  verbose: true
-akshare:
-  delay_seconds: 1.0
-  timeout: 30
-baostock:
-  consecutive_fail_threshold: 3
-  reconnect_interval: 150
-  timeout: 30
-broker:
-  provider: sim
-  simulation: true
-circuit_breaker:
-  failure_threshold: 3
-  half_open_calls: 1
-  recovery_timeout: 60
+# ==================== QuantPilot 统一配置 ====================
+# 版本: 1.0.0
+# 唯一配置文件：所有外部接口、数据源、模型、推送都在这里修改
+
+# ---------- 运行模式 ----------
+mode: local                    # local | cloud
+port: 7861                     # Web UI 端口
+
+# ---------- 数据源注册表 ----------
+# 改这里就能切换数据源，不需要动代码
 data_sources:
-  dragon_tiger:
-    fallbacks:
-    - akshare
-    primary: zzshare
-  historical:
-    fallbacks:
-    - mootdx
-    - baostock
-    - akshare
-    primary: zzshare
-  minute_kline:
-    fallbacks:
-    - zzshare
-    primary: mootdx
-  northbound:
-    fallbacks:
-    - exchange_csv
-    primary: zzshare
-  realtime:
-    fallbacks:
-    - tencent
-    primary: mootdx
+  historical:                   # 历史 K 线
+    primary: tickflow
+    fallbacks: [baostock, akshare]
+  realtime:                     # 实时行情
+    primary: tickflow
+    fallbacks: [sina, eastmoney]
+  dragon_tiger:                 # 龙虎榜
+    primary: tushare
+    fallbacks: [akshare]
+  northbound:                   # 北向资金
+    primary: tushare
+    fallbacks: [exchange_csv]
+
+# ---------- TickFlow ----------
+tickflow:
+  api_key: "${TICKFLOW_API_KEY}"
+  base_url: "https://api.tickflow.org"
+  rate_limits:
+    quotes_symbols: 120         # /min
+    quotes_universe: 60
+    kline_batch: 60
+    kline_single: 120
+    intraday_batch: 30
+    intraday_single: 60
+
+# ---------- BaoStock (fallback) ----------
+baostock:
+  reconnect_interval: 150       # 每 N 只股票主动重连
+  consecutive_fail_threshold: 3
+  timeout: 30
+
+# ---------- AkShare (最后 fallback) ----------
+akshare:
+  delay_seconds: 1.0            # 严格限速
+  timeout: 30
+
+# ---------- 新浪实时行情 (fallback) ----------
+sina:
+  timeout: 10.0
+
+# ---------- 东财实时行情 (fallback) ----------
 eastmoney:
   timeout: 10.0
-embedding:
-  batch_size: 10
-  cache_max: 5000
-  dimension: 768
-  model: shibing624/text2vec-base-chinese
-  provider: local
-file_ops:
-  allowed_dirs:
-  - .
-  max_file_size: 10485760
-holidays:
-- '2026-01-01'
-- '2026-01-02'
-- '2026-02-16'
-- '2026-02-17'
-- '2026-02-18'
-- '2026-02-19'
-- '2026-02-20'
-- '2026-02-23'
-- '2026-02-24'
-- '2026-04-06'
-- '2026-05-01'
-- '2026-05-04'
-- '2026-05-05'
-- '2026-06-19'
-- '2026-10-01'
-- '2026-10-02'
-- '2026-10-05'
-- '2026-10-06'
-- '2026-10-07'
-- '2026-10-08'
-live:
-  accounts:
-    国泰海通:
-      broker: 国泰海通证券
-      cash: 30918.79
-      commission:
-        bond:
-          min: 1.0
-          rate: 5.0e-05
-        etf:
-          min: 5.0
-          rate: 5.0e-05
-        stock:
-          min: 5.0
-          rate: 8.00001e-05
-      stamp_tax_sell: 0.0005
-      total_assets: 41886.79
-      transfer_fee: 1.0e-05
-    银河证券:
-      broker: 银河证券
-      cash: 2407.54
-      commission:
-        fund:
-          min: 0.01
-          rate: 5.0e-06
-        stock:
-          min: 5.0
-          rate: 8.6e-05
-      fixed_income: 50000
-      fixed_income_maturity: '2026-07-20'
-      stamp_tax_sell: 0.0005
-      total_assets: 108279.34
-      transfer_fee: 1.0e-05
+
+# ---------- Tushare (龙虎榜/北向) ----------
+tushare:
+  token: "${TUSHARE_TOKEN}"     # 免费注册获取
+
+# ---------- LLM 注册表 ----------
 llm:
-  flash:
-    api_key: sk-06742c13123f49e8884df05fb339ec9d
-    base_url: https://api.deepseek.com
-    max_tokens: 8192
-    model: deepseek-v4-flash
-    protocol: openai
-    provider: deepseek
-    temperature: 0.7
   primary:
-    api_key: sk-06742c13123f49e8884df05fb339ec9d
-    base_url: https://api.deepseek.com
-    max_tokens: 16384
+    provider: deepseek
+    base_url: "https://api.deepseek.com"
+    api_key: "${DEEPSEEK_API_KEY}"
     model: deepseek-v4-pro
     protocol: openai
-    provider: deepseek
+    max_tokens: 16384
     temperature: 0.3
+  flash:
+    provider: deepseek
+    base_url: "https://api.deepseek.com"
+    api_key: "${DEEPSEEK_API_KEY}"
+    model: deepseek-v4-flash
+    protocol: openai
+    max_tokens: 8192
+    temperature: 0.7
+
+# ---------- Embedding ----------
+embedding:
+  provider: local               # local | openai | none
+  model: shibing624/text2vec-base-chinese
+  dimension: 768
+  batch_size: 10
+  cache_max: 5000
+
+# ---------- Agent ----------
+agent:
+  max_rounds: 10
+  verbose: true
+  enable_judge: true
+  max_tool_result_chars: 8000
+  tool_repeat_detection_window: 5
+
+# ---------- 记忆系统 ----------
 memory:
-  compression_batch: 10
   context_max_chars: 4000
+  search_top_k: 5
+  compression_batch: 10
+  session_ttl_hours: 24
   decay_threshold: 0.1
   max_memories: 200
-  search_top_k: 5
-  session_ttl_hours: 24
-mode: local
-port: 7861
-retention:
-  alerts_days: 30
-  daily_kline_days: 0
-  market_snapshot_days: 365
-  minute_kline_days: 30
-  trade_log_days: 0
-retry:
-  backoff_factor: 2.0
-  base_delay: 1.0
-  jitter: true
-  max_delay: 30.0
-  max_retries: 3
-schedule:
-  evening: 30 15 * * 1-5
-  maintenance: 0 3 * * 0
-  morning: 5 9 * * 1-5
-  noon: 35 11 * * 1-5
-  strategy_evolution: 0 10 * * 6
-  watchdog_start: 10 9 * * 1-5
-  watchdog_stop: 10 15 * * 1-5
-server:
-  domain: quantpilot.cn
+
+# ---------- 实盘 ----------
+live:
+  initial_capital: 100000
+  commission_rate: 0.0002        # 万2
+  stamp_tax_sell: 0.0005         # 万5（卖）
+  transfer_fee: 0.00001          # 万0.1
+  slippage: 0.0015               # 0.15%
+  positions_file: ""             # 可选，外部持仓文件路径
+
+# ---------- 模拟盘 ----------
 simulation:
+  enabled: true
   capital:
     P1_顺势接力: 150000
     P2_逆势低吸: 100000
     P3_打板先锋: 100000
     P4_波段猎手: 80000
     P5_ETF轮动: 70000
-  enabled: true
   state_filters:
+    P3_打板先锋:
+      max_break_rate: 0.40
+      min_streak_height: 3
     P1_顺势接力:
       min_streak_height: 3
     P2_逆势低吸:
       min_fall_count: 5
-    P3_打板先锋:
-      max_break_rate: 0.4
-      min_streak_height: 3
-sina:
-  timeout: 10.0
-tickflow:
-  api_key: ${TICKFLOW_API_KEY}
-  base_url: https://api.tickflow.org
-  rate_limits:
-    intraday_batch: 30
-    intraday_single: 60
-    kline_batch: 60
-    kline_single: 120
-    quotes_symbols: 120
-    quotes_universe: 60
-tushare:
-  token: ''
+
+# ---------- 盯盘 ----------
 watchdog:
+  poll_interval: 60              # 轮询间隔（秒）
+  max_stocks: 30                 # 最大监控数
+  kline_period: "15m"            # K 线周期
   alerts:
-    price_spike: 3.0
-    volume_spike: 3.0
-  kline_period: 5m
-  max_stocks: 30
-  poll_interval: 10
-wechat:
-  admin_users:
-  - YangJie
-  agent_id: 1000002
-  agent_secret: vJaxxotrmsA7no6ZNRG2nuTW_goEhVYnJW9bBDDUzA4
-  callback_port: 8000
-  corp_id: wwbf92bb8d06f35eac
-  enabled: true
-  encoding_aes_key: DpNFQSRjZ0JJajU4bHdMblVPdk5nc3dhRktMRlVLabc
-  token: QuantPilotToken2026
+    price_spike: 3.0             # 异动涨跌幅%
+    volume_spike: 3.0            # 放量倍数
+
+# ---------- 推送渠道 ----------
+notification:
+  primary: wechat_webhook
+  wechat_webhook:
+    url: "${WECHAT_WEBHOOK_URL}"
+  # 未来扩展：
+  # telegram:
+  #   bot_token: "${TELEGRAM_BOT_TOKEN}"
+  #   chat_id: "${TELEGRAM_CHAT_ID}"
+
+# ---------- 券商接口 ----------
+broker:
+  simulation: true               # true=模拟盘, false=实盘
+  provider: sim                  # sim | qmt | htss
+  # qmt:
+  #   path: "C:\\国金证券QMT\\bin"
+  #   account: ""
+
+# ---------- 调度 ----------
+schedule:
+  morning: "30 8 * * 1-5"       # 盘前策略
+  noon: "35 11 * * 1-5"         # 午盘修正
+  evening: "30 15 * * 1-5"      # 收盘复盘
+  watchdog_start: "25 9 * * 1-5"  # 启动盯盘
+  watchdog_stop: "10 15 * * 1-5"  # 停止盯盘
+  strategy_evolution: "0 10 * * 6"  # 每周六策略进化
+  maintenance: "0 3 * * 0"      # 每周日凌晨3点维护
+
+# ---------- 数据保留 ----------
+retention:
+  daily_kline_days: 0            # 日K永久保留(0=不限)
+  minute_kline_days: 30
+  market_snapshot_days: 365
+  alerts_days: 30
+  trade_log_days: 0              # 交易记录永久
+
+# ---------- 重试策略 ----------
+retry:
+  max_retries: 3
+  base_delay: 1.0
+  max_delay: 30.0
+  backoff_factor: 2.0
+  jitter: true
+
+# ---------- 熔断器 ----------
+circuit_breaker:
+  failure_threshold: 3
+  recovery_timeout: 60
+  half_open_calls: 1
+
+# ---------- 文件操作 ----------
+file_ops:
+  allowed_dirs:
+    - "${USER_DESKTOP}/每日早报"
+    - "${PROJECT_DIR}"
+  max_file_size: 10485760        # 10MB

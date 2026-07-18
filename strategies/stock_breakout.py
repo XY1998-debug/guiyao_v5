@@ -128,7 +128,7 @@ def backtest_breakout(
             trail_stop = (price - p["peak_price"]) / p["peak_price"]
 
             if pnl <= stop_loss or (pnl > 0.05 and trail_stop < -0.08):
-                sell_val = p["shares"] * price * 0.99814
+                sell_val = p["shares"] * price * 0.99892  # 国泰个股万0.8+印花税千1
                 cash += sell_val
                 p["pnl"] = pnl
                 trades.append(TradeRecord(
@@ -150,7 +150,7 @@ def backtest_breakout(
             if pnl >= take_profit_add and not p.get("added", False):
                 add_shares = int(cash * (add_pct - trial_pct) / price / 100) * 100
                 if add_shares >= 100:
-                    add_cost = add_shares * price * 1.00086  # 买入佣金万8.6（国泰海通个股）
+                    add_cost = add_shares * price * 1.00008  # 国泰个股万0.8  # 买入佣金万8.6（国泰海通个股）
                     if add_cost <= cash:
                         cash -= add_cost
                         p["shares"] += add_shares
@@ -177,7 +177,7 @@ def backtest_breakout(
                 days_held = 0
             if days_held > 20 and p.get("pnl", 0) < 0:
                 pr = p["current_price"]
-                cash += p["shares"] * pr * 0.99814
+                cash += p["shares"] * pr * 0.99892  # 国泰个股万0.8+印花税千1
                 trades.append(TradeRecord(
                     code=code, buy_date=p["buy_date"],
                     buy_price=p["cost"], shares=p["shares"],
@@ -213,7 +213,7 @@ def backtest_breakout(
             shares = int(trial_amount / price / 100) * 100
             if shares < 100:
                 continue
-            cost = shares * price * 1.00086  # 买入佣金万8.6（国泰海通个股）
+            cost = shares * price * 1.00008  # 国泰个股万0.8  # 买入佣金万8.6（国泰海通个股）
             if cost <= cash:
                 cash -= cost
                 pos[code] = {

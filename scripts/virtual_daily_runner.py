@@ -36,7 +36,7 @@ def run_daily(prices_t, atr_t, limit_t, signals_t, state):
         state["cb"], state["bought_in"], bought_out,
         state["yld"], U, S
     ,
-            2.5, 0.00086, 0.001, 5.0)
+            2.5, 0.00008, 0.001, 5.0)
     state["bought_in"] = bought_out
     state["yld"] = (prices_t - limit_t) < 0.01
 

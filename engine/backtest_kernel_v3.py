@@ -27,7 +27,7 @@ def backtest_kernel_v3(
     yesterday_limit_down, # (S,) int8     — 昨日是否跌停(只读)
     n_univ, n_stocks,     # int — 维度
     m_sl,             # float — 止损乘数(个股2.5/ETF1.5)
-    commission_rate,  # float — 买入佣金率(国泰0.0008/银河0.0086)
+    commission_rate,  # float — 买入佣金率(国泰0.00008/银河0.000086)
     stamp_duty,       # float — 卖出印花税率(0.001)
     min_commission,   # float — 最低佣金(5.0)
 ):

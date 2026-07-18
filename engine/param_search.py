@@ -70,7 +70,7 @@ def run_single_backtest(
             price_seq[t], sig, atr_seq[t], limit_seq[t],
             init_capital, cash, pos, cost,
             bought_y, bought_t, was_ld, 1, S,
-            2.5, 0.00086, 0.001, 5.0,
+            2.5, 0.00008, 0.001, 5.0,
         )
         # 跨日 T+1 状态迁移: 今日买入标记 → 昨日买入标记
         np.copyto(bought_y, bought_t)
