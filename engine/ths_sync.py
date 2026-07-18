@@ -229,11 +229,16 @@ class THSSync:
 
 def sync_main(codes: List[str]):
     """每日调用入口"""
-    import sys
+    import sys, json
     sys.path.insert(0, str(Path(__file__).parent.parent))
-    ths = THSSync()
+    cfg_path = Path(__file__).parent.parent / "config.json"
+    if cfg_path.exists():
+        cfg = json.loads(cfg_path.read_text())
+        ths = THSSync(username=cfg.get("ths_username",""), password=cfg.get("ths_password",""))
+    else:
+        ths = THSSync()
     if not ths.is_configured:
-        print("❌ THS 未配置。请先抓包填写常量。")
+        print("❌ THS 未配置。需在 config.json 中设置 ths_username/ths_password")
         return
     ok = ths.sync_watchlist(codes)
     print(f"{'✅' if ok else '❌'} THS 同步: {len(codes)} 只 → {'成功' if ok else '失败'}")
