@@ -73,8 +73,8 @@ def sync_to_ths(signals: List[dict], top_candidates: List[str]):
     codes = list({s["stock"] for s in signals} | set(top_candidates))
     if not codes:
         return
-    try:
-        from ths_favorite.selfstock_v1 import upload_self_stock
-        upload_self_stock(codes)
-    except ImportError:
-        pass  # 本地开发可跳过
+    from engine.ths_sync import THSSync
+    ths = THSSync()
+    if not ths.is_configured:
+        return  # 未配置，静默跳过
+    ths.sync_watchlist(codes)
