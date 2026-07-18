@@ -78,15 +78,21 @@ class THSSync:
 
     用法:
         from engine.ths_sync import THSSync
-        ths = THSSync()
+        ths = THSSync(username="your_phone", password="your_pwd")
         ths.sync_watchlist(["000001", "000002", "600519"])
     """
 
-    def __init__(self, cookie: str = "", host: str = THS_HOST):
+    def __init__(self, username: str = "", password: str = "",
+                 cookie: str = "", host: str = THS_HOST):
         self.host = host
+        self._username = username
+        self._password = password
         self._cookie = cookie or WATCHLIST_HEADERS.get("Cookie", "")
         self._last_error = ""
-        self._configured = bool(self._cookie and "请在此处" not in self._cookie)
+        # 先试 TCP 协议，不行再试 HTTP
+        self._use_tcp = bool(username and password)
+        self._use_http = bool(self._cookie and "请在此处" not in self._cookie)
+        self._configured = self._use_tcp or self._use_http
 
     # ── 公共方法 ──
 
@@ -104,16 +110,30 @@ class THSSync:
         失败时自动发送企微通知。
         """
         if not self._configured:
-            logger.warning("THS 同步未配置，跳过。需先抓包填写常量。")
+            logger.warning("THS 同步未配置，跳过。需设置账号密码或 cookie。")
             return False
 
-        payload = build_payload(codes)
-        try:
-            return self._call_api(WATCHLIST_URL, payload)
-        except THSSyncError as e:
-            self._last_error = str(e)
-            self._notify_failure(codes)
-            return False
+        # 优先 TCP 协议，降级到 HTTP
+        if self._use_tcp:
+            from engine.ths_protocol import sync_watchlist_tcp
+            ok, err = sync_watchlist_tcp(self._username, self._password, codes)
+            if ok:
+                logger.info(f"THS TCP 同步成功: {len(codes)} 只")
+                return True
+            self._last_error = f"TCP 协议失败: {err}"
+            logger.warning(self._last_error)
+
+        if self._use_http:
+            payload = build_payload(codes)
+            try:
+                ok = self._call_api(WATCHLIST_URL, payload)
+                if ok:
+                    return True
+            except THSSyncError as e:
+                self._last_error = str(e)
+
+        self._notify_failure(codes)
+        return False
 
     def place_order(self, code: str, direction: str, price: float,
                     shares: int, broker: str = "银河") -> bool:
