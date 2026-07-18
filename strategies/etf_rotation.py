@@ -153,7 +153,7 @@ def backtest_etf_trend(
             old_df = today_df.filter(pl.col("code") == pos_code)
             if len(old_df) > 0:
                 sell_price = old_df["close"][0]
-                cash += pos_shares * sell_price * 0.99814  # 佣金万8.6+印花税千1  # 万三佣金
+                cash += pos_shares * sell_price * 0.99814  # 卖出万8.6+千1  # 佣金万8.6+印花税千1  # 万三佣金
             pos_code = None
             pos_shares = 0
 
@@ -161,7 +161,7 @@ def backtest_etf_trend(
         if in_trend and (pos_code != new_code):
             shares = int(cash * 0.95 / new_price / 100) * 100  # 整数手
             if shares >= 100:
-                cost = shares * new_price * 1.0005  # 含买入佣金
+                cost = shares * new_price * 1.00086  # 买入万8.6（统一费率）  # 含买入佣金
                 if cost <= cash:
                     cash -= cost
                     pos_code = new_code
@@ -235,10 +235,10 @@ def backtest_subset(df, dates_subset, lookback, freq):
         if pos[0] and pos[0] != code:
             odf = day_df.filter(pl.col("code") == pos[0])
             cp = odf["close"][0] if len(odf) > 0 else 0
-            cash += pos[1] * cp * 0.99814  # 佣金万8.6+印花税千1
+            cash += pos[1] * cp * 0.99814  # 卖出万8.6+千1  # 佣金万8.6+印花税千1
             pos = (None, 0, 0.0)
         sh = int(cash * 0.95 / price / 100) * 100
-        cost = sh * price * 1.0005
+        cost = sh * price * 1.00086  # 买入万8.6（统一费率）
         if sh >= 100 and cost <= cash and pos[0] != code:
             cash -= cost
             pos = (code, sh, price)

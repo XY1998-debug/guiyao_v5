@@ -27,6 +27,12 @@ def run_wf_validation(params_grid,dates,ret,rd,eng,stress=None,mode="full"):
         dsr = calc_dsr(avg_sh, n_samples, n)
         if dsr<=0: continue
         if stress:
-            pass  # 压力舱 wiring 未完成
+            def _run_stress(p, stress):
+                nv, _ = eng(p)  # run_single_backtest returns (nv, sharpe)
+                rets = np.diff(nv) / nv[:-1]
+                return rets
+            vet, evt = stress_chamber_veto(p, _run_stress, stress)
+            if vet:
+                continue
         final.append(p)
     return final
