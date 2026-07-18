@@ -113,14 +113,13 @@ class THSSync:
             logger.warning("THS 同步未配置，跳过。需设置账号密码或 cookie。")
             return False
 
-        # 优先 TCP 协议，降级到 HTTP
+        # 登录并同步
         if self._use_tcp:
-            from engine.ths_protocol import sync_watchlist_tcp
-            ok, err = sync_watchlist_tcp(self._username, self._password, codes)
+            from engine.ths_protocol import sync_watchlist as ths_sync
+            ok, err = ths_sync(self._username, self._password, codes)
             if ok:
-                logger.info(f"THS TCP 同步成功: {len(codes)} 只")
                 return True
-            self._last_error = f"TCP 协议失败: {err}"
+            self._last_error = f"THS 失败: {err}"
             logger.warning(self._last_error)
 
         if self._use_http:
