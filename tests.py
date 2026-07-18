@@ -95,6 +95,31 @@ class TestMetrics(unittest.TestCase):
         self.assertGreater(d, 0)
         self.assertGreater(p, 0)
 
+# ── 6a. Numba 内核冒烟测试 ──
+class TestKernelSmoke(unittest.TestCase):
+    def test_single_stock_buy(self):
+        from engine.backtest_kernel_v3 import backtest_kernel_v3
+        import numpy as np
+        p = np.array([10.0]); s = np.array([[1]]); a = np.array([1.0])
+        l = np.array([9.0])
+        c = np.full((1,1),100000.0); ps = np.zeros((1,1)); cs = np.zeros((1,1))
+        bi = np.zeros((1,1),dtype=np.int8); bo = np.zeros((1,1),dtype=np.int8)
+        yl = np.zeros(1,dtype=np.int8)
+        backtest_kernel_v3(p,s,a,l,100000.0,c,ps,cs,bi,bo,yl,1,1,2.5,0.00008,0.001,5.0)
+        self.assertGreater(ps[0,0], 0, "买入后持仓 > 0")
+        self.assertLess(c[0,0], 100000, "现金减少")
+
+    def test_limit_down_blocks_sell(self):
+        from engine.backtest_kernel_v3 import backtest_kernel_v3
+        import numpy as np
+        p = np.array([10.0, 10.0]); a = np.array([1.0, 1.0])
+        l = np.array([10.0-1e-5, 9.0]); s = np.array([[-1, 1]])
+        c = np.full((1,1),100000.0); ps = np.array([[100.0,0.0]]); cs = np.zeros((1,2))
+        bi = np.zeros((1,2),dtype=np.int8); bo = np.zeros((1,2),dtype=np.int8)
+        yl = np.zeros(2,dtype=np.int8)
+        backtest_kernel_v3(p,s,a,l,100000.0,c,ps,cs,bi,bo,yl,1,2,2.5,0.00008,0.001,5.0)
+        self.assertEqual(ps[0,0], 100.0, "跌停未卖出")
+
 # ── 6. 编译验证 ──
 class TestCompilation(unittest.TestCase):
     def test_all(self):
