@@ -45,6 +45,13 @@ class ShadowLedger:
                 buy_time TEXT, buy_price REAL, shares INTEGER,
                 PRIMARY KEY (stock_code, source)
             )""")
+        # 迁移: 旧版 trades 表缺少 pnl 列
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(trades)").fetchall()]
+        if "pnl" not in cols:
+            conn.execute("ALTER TABLE trades ADD COLUMN pnl REAL DEFAULT 0")
+        if "shadow_closed_pnl" not in [r[1] for r in conn.execute("PRAGMA table_info(weekly_report)").fetchall()]:
+            conn.execute("ALTER TABLE weekly_report ADD COLUMN shadow_closed_pnl REAL DEFAULT 0")
+            conn.execute("ALTER TABLE weekly_report ADD COLUMN user_closed_pnl REAL DEFAULT 0")
         conn.commit(); conn.close()
 
     # ── 记录 API ──
